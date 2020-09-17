@@ -1,0 +1,27 @@
+name: 'Simple Cache'
+description: 'Simple caching action without boilerplate'
+inputs: 
+  name:
+    description: 'Name for the cache'
+    required: true
+    default: 'cache'
+  path: 
+    description: 'Path to the folders / files to be cached'
+    required: true
+  trigger:
+    description: 'Path to files to watch for changes which would invalidate the cache'
+outputs:
+  cache-hit:
+    description: 'Whether or not the cache was restored'
+    value: ${{ steps.simple-cache.outputs.cache-hit }}
+runs:
+  using: "composite"
+  steps:
+    - id: simple-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ inputs.path }}
+        key: [${{ inputs.name }}]-${{ runner.os }}-${{ hashFiles(inputs.trigger) }}
+        restore-keys: |
+          [${{ inputs.name }}]-${{ runner.os }}-
+          [${{ inputs.name }}]-
